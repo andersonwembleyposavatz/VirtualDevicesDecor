@@ -1,5 +1,5 @@
 /**
- *  VIRTUAL Switch for Bulb
+ *  VIRTUAL Switch for Light
  *
  *  Copyright 2021 Anderson W Posavatz
  *
@@ -13,12 +13,11 @@
  *  for the specific language governing permissions and limitations under the License.
  */
 metadata {
-    definition (name: "VIRTUAL Switch for Bulb", namespace: "andersonwembleyposavatz", author: "Anderson Wembley Posavatz", ocfDeviceType: "oic.d.light", mnmn: "SmartThings", vid: "generic-rgbw-color-bulb", runLocally: true) {
+    definition (name: "VIRTUAL DECOR for Light", namespace: "andersonwembleyposavatz", author: "Anderson Wembley Posavatz", ocfDeviceType: "oic.d.light", mnmn: "SmartThings", runLocally: true) {
         capability "Actuator"
         capability "Sensor"
         capability "Switch"
     	capability "Health Check"
-    	capability "Light"
         
 
     }
@@ -30,20 +29,20 @@ metadata {
     tiles(scale: 2) {
         multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
             tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-                attributeState "on", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc", nextState:"turningOff"
-                attributeState "off", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#ffffff", nextState:"turningOn"
-                attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.switches.light.on", backgroundColor:"#00a0dc", nextState:"turningOff"
-                attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.switches.light.off", backgroundColor:"#ffffff", nextState:"turningOn"
+                attributeState "on", label:'${name}', action:"switch.off", icon:"st.Lighting.light15", backgroundColor:"#00a0dc", nextState:"turningOff"
+                attributeState "off", label:'${name}', action:"switch.on", icon:"st.Lighting.light15", backgroundColor:"#ffffff", nextState:"turningOn"
+                attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.Lighting.light15", backgroundColor:"#00a0dc", nextState:"turningOff"
+                attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.Lighting.light15", backgroundColor:"#ffffff", nextState:"turningOn"
                 }
 			}
         standardTile("explicitOn", "device.switch", width: 2, height: 2, decoration: "flat") {
-            state "default", label: "On", action: "switch.on", icon: "st.lights.philips.hue-single", backgroundColor: "#ffffff"
+            state "default", label: "On", action: "switch.on", icon: "st.Lighting.light15-hue", backgroundColor: "#00a0dc"
         }
         standardTile("explicitOff", "device.switch", width: 2, height: 2, decoration: "flat") {
-            state "default", label: "Off", action: "switch.off", icon: "st.lights.philips.hue-single", backgroundColor: "#ffffff"
+            state "default", label: "Off", action: "switch.off", icon: "st.Lighting.light15-hue", backgroundColor: "#ffffff"
         }
 
-        main "switch"
+        main "light"
         details "switch", "explicitOn", "explicitOff", "On", "Off"
         }
     }
@@ -69,5 +68,5 @@ def explicitOff() {
 }
 
 def installed() {
-    on()
+    off()
     }

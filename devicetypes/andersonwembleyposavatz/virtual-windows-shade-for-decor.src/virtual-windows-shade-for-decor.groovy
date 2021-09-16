@@ -30,29 +30,30 @@ metadata {
 	}
 
     tiles {
-        multiAttributeTile(name:"toggle", type: "generic", width: 6, height: 4){
+        multiAttributeTile(name:"windowsShade", type: "generic", width: 6, height: 4){
             tileAttribute ("device.windowsShade", key: "PRIMARY_CONTROL") {
-		             state("open",  label:'${name}', action: "close", icon: "st.shades.shade-open", backgroundColor: "#79b821", nextState: "closing")
-                     state("closed", label:'${name}', action: "open", icon: "st.shades.shade-closed", backgroundColor: "#ffffff", nextState: "opening")
-                     state("opening",  label:'${name}', action: "close", icon: "st.shades.shade-open", backgroundColor: "#79b821")
-                     state("closing",  label:'${name}', action: "open", icon: "st.shades.shade-closed", backgroundColor: "#ffffff")
+                attributeState "open", label:'${name}', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+				attributeState "closed", label:'${name}', action:"open", icon:"st.shades.shade-closed", backgroundColor:"#ffffff", nextState:"opening"
+				attributeState "partially open", label:'Open', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+				attributeState "opening", label:'${name}', action:"pause", icon:"st.shades.shade-opening", backgroundColor:"#79b821", nextState:"partially open"
+				attributeState "closing", label:'${name}', action:"pause", icon:"st.shades.shade-closing", backgroundColor:"#ffffff", nextState:"partially open" 
     }
             tileAttribute ("device.battery", key: "SECONDARY_CONTROL") {
                 attributeState "battery", label: "74", unit: "%"
             }
         }
 
-		standardTile("Open", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "open", action:"open", icon:"st.Home.home2"
+		standardTile("open", "device.windowShade", width: 2, height: 2, decoration: "flat") {
+			state "default", label: "open", action:"open", icon:"st.shades.shade-open"
 		}
-		standardTile("Close", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "closed", action:"close", icon:"st.Home.home2"
+		standardTile("closed", "device.windowShade", width: 2, height: 2, decoration: "flat") {
+			state "default", label: "closed", action:"close", icon:"st.shades.shade-closed"
 		
 	    }
 
         
-		main "toogle", "windowShade"
-		details "windowShade", "battery"
+		main "windowShade"
+		details "windowShade", "battery", "contact", "windowShadeOpen", "windowShadeClose", "windowShadePause"
                 }
 } 
 

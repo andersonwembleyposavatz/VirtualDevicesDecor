@@ -39,25 +39,28 @@ metadata {
                 attributeState "closing", label: '${name}', action: "open", icon: "http://www.ezex.co.kr/img/st/window_close.png", backgroundColor: "#ffffff", nextState: "opening"
             }
             tileAttribute("device.contact", key: "SECONDARY_CONTROL") {
-                attributeState "closed", icon: "st.contact.contact.closed", label: ""
-                attributeState "open", icon: "st.contact.contact.open", label: ""
+                attributeState "closed", icon: "st.shades.shade-closed", label: ""
+                attributeState "open", icon: "st.shades.shade-open", label: ""
                          
+             }
+            tileAttribute ("device.battery", key: "SECONDARY_CONTROL") {
+                attributeState "battery", label: "74", unit: "%"
             }
       }
 
 		standardTile("Open", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "${name}", action:"open", icon:"st.Home.home2"
+			state "default", label: "${name}", action:"open", icon:"st.shades.shade-open"
 		}
 		standardTile("Close", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "${name}", action:"close", icon:"st.Home.home2"
+			state "default", label: "${name}", action:"close", icon:"st.shades.shade-closed"
 		}
 		standardTile("Pause", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "${name}", action:"pause", icon:"st.Home.home2"
+			state "default", label: "${name}", action:"pause", icon:"st.shades.shade-open"
 	
 		}
 
-        main "windowShade", "contact"
-        details "toggle", "windowShade", "contact"
+        main "windowShade"
+        details "toggle", "windowShade", "contact", "battery"
     }
 }
 
@@ -107,7 +110,7 @@ def installed() {
 
 
     sendEvent(name: "supportedWindowShadeCommands", value: JsonOutput.toJson(["open", "close", "pause"]), displayed: false)
-    sendEvent(name: "battery", value: 100)
+    sendEvent(name: "battery", value: 85)
     sendEvent(name: "contact", value: (["open", "close"]))
 }
 
@@ -119,10 +122,10 @@ def updated() {
 def initialize() {
 	log.trace "Executing 'initialize'"
     
-    sendEvent(name: "windowShade", value: "closed")
-    sendEvent(name: "contact", value: "closed")
-    sendEvent(name: "switch", value: "off")
-    sendEvent(name: "battery", value: 100)
+    sendEvent(name: "windowShade", value: "open")
+    sendEvent(name: "contact", value: "open")
+    sendEvent(name: "switch", value: "on")
+    sendEvent(name: "battery", value: 85)
 
 
     

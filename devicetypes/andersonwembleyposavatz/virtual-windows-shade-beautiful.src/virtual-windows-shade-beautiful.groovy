@@ -59,64 +59,40 @@ metadata {
     tiles(scale: 2) {
         multiAttributeTile(name: "windowShade", type: "generic", width: 6, height: 4) {
             tileAttribute("device.windowShade", key: "PRIMARY_CONTROL") {
-                attributeState "open",  label:'${name}', action: "close", icon: "http://www.ezex.co.kr/img/st/window_open.png", backgroundColor: "#79b821", nextState: "closing"
-                attributeState "closed", label:'${name}', action: "open", icon: "http://www.ezex.co.kr/img/st/window_close.png", backgroundColor: "#ffffff", nextState: "opening"
-   				attributeState "partially open", label:'Open', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
-                attributeState "opening",  label:'${name}', action: "close", icon: "http://www.ezex.co.kr/img/st/window_open.png", backgroundColor: "#79b821", nextState: "closing"
-                attributeState "closing",  label:'${name}', action: "open", icon: "http://www.ezex.co.kr/img/st/window_close.png", backgroundColor: "#ffffff", nextState: "opening"
-			}
-			/*tileAttribute ("device.level", key: "SLIDER_CONTROL") {
-				attributeState "level", action:"setLevel"
-			}*/
-            
-		}
-		standardTile("Open", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "Open", action:"open", icon:"http://www.ezex.co.kr/img/st/window_open.png"
-		}
-		standardTile("Close", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "Close", action:"close", icon:"http://www.ezex.co.kr/img/st/window_close.png"
-		}
+                attributeState "open", label:'${name}', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+                attributeState "closed", label:'${name}', action:"open", icon:"st.shades.shade-closed", backgroundColor:"#ffffff", nextState:"opening"
+                attributeState "partially open", label:'Open', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+                attributeState "opening", label:'${name}', action:"stop", icon:"st.shades.shade-opening", backgroundColor:"#79b821", nextState:"partially open"
+                attributeState "closing", label:'${name}', action:"stop", icon:"st.shades.shade-closing", backgroundColor:"#ffffff", nextState:"partially open"
+            }
+            tileAttribute ("device.level", key: "SLIDER_CONTROL") {
+                attributeState "level", action:"setLevel"
+            }
+        }
 
-		standardTile("windowShadeOpen", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "open", action:"open", icon:"st.Home.home2"
-		}
-		standardTile("windowShadeClose", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "close", action:"close", icon:"st.Home.home2"
-		}
-		standardTile("windowShadePause", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "pause", action:"pause", icon:"st.Home.home2"
-		}
-		standardTile("windowShadePreset", "device.windowShadePreset", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "preset", action:"presetPosition", icon:"st.Home.home2"
-		}
+        standardTile("home", "device.level", width: 2, height: 2, decoration: "flat") {
+            state "default", label: "home", action:"presetPosition", icon:"st.Home.home2"
+        }
 
-		valueTile("statesLabel", "device.states", width: 6, height: 1, decoration: "flat") {
-			state "default", label: "State Events:"	
-		}
+        standardTile("refresh", "device.refresh", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
+            state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh", nextState: "disabled"
+            state "disabled", label:'', action:"", icon:"st.secondary.refresh"
+        }
 
-		standardTile("windowShadePartiallyOpen", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "partially open", action:"partiallyOpen", icon:"st.Home.home2"
-		}
-		standardTile("windowShadeOpening", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "opening", action:"opening", icon:"st.Home.home2"
-		}
-		standardTile("windowShadeClosing", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "closing", action:"closing", icon:"st.Home.home2"
-		}
-		standardTile("windowShadeOpened", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "opened", action:"opened", icon:"st.Home.home2"
-		}
-		standardTile("windowShadeClosed", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "closed", action:"closed", icon:"st.Home.home2"
-		
-		}
+        valueTile("battery", "device.battery", decoration: "flat", inactiveLabel: false, width: 2, height: 2) {
+            state "battery", label:'batt.', unit:"",
+                    backgroundColors:[
+                            [value: 0, color: "#bc2323"],
+                            [value: 6, color: "#44b621"]
+                    ]
+        }
         
 		main(["windowShade"])
 		details(["windowShade",
 				 "commandsLabel",
-				 "windowShadeOpen", "windowShadeClose", "windowShadePause", "windowShadePreset", "blank",
+				 "windowShadeOpen", "windowShadeClose", "windowShadePause", "windowShadePreset", "Open", "Close", "Pause",
 				 "statesLabel",
-				 "windowShadePartiallyOpen", "windowShadeOpening", "windowShadeClosing", "windowShadeOpened", "windowShadeClosed", "windowShadeUnknown"])
+				 "windowShadePartiallyOpen", "windowShadeOpening", "windowShadeClosing", "windowShadeOpened", "windowShadeClosed", ])
                  }
 }
 private getSupportedCommandsMap() {
@@ -156,6 +132,9 @@ def updated() {
 
 private initialize() {
 	log.trace "Executing 'initialize'"
+    
+    sendEvent(name: "windowShade", value: "opened", isStateChange: true)
+	sendEvent(name: "contact", value: "open", isStateChange: true)
 
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
 	sendEvent(name: "healthStatus", value: "online")
@@ -166,14 +145,6 @@ private initialize() {
 def parse(String description) {
 	log.trace "parse($description)"
 }
-
-// Capability commands
-
-// TODO: Implement a state machine to fine tune the behavior here.
-// Right now, tapping "open" and then "pause" leads to "opening",
-// "partially open", then "open" as the open() command completes.
-// The `runIn()`s below should all call a marshaller to handle the
-// movement to a new state. This will allow for shade level sim, too.
 
 def open() {
 	log.debug "open()"
@@ -233,7 +204,7 @@ def closing() {
 }
 
 def opened() {
-	sendEvent(name: "windowShade", value: "opened", isStateChange: true)
+	sendEvent(name: "windowShade", value: "open", isStateChange: true)
 	sendEvent(name: "contact", value: "open", isStateChange: true)
 }
 

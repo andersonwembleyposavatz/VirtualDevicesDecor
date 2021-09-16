@@ -26,24 +26,24 @@ metadata {
 
 	// UI tile definitions
 	tiles(scale: 2) {
-		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: false){
+		multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
 			tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-				attributeState "on", label:'${name}', action:"switch.off", icon:"st.lights.multi-light-bulb-on", backgroundColor:"#00A0DC", nextState:"turningOff"
-				attributeState "off", label:'${name}', action:"switch.on", icon:"st.lights.multi-light-bulb-off", backgroundColor:"#ffffff", nextState:"turningOn"
-				attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.lights.multi-light-bulb-on", backgroundColor:"#00A0DC", nextState:"turningOff"
-				attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.lights.multi-light-bulb-off", backgroundColor:"#ffffff", nextState:"turningOn"
+				attributeState "on", label:'${name}', action:"switch.off", icon:"st.lights.philips.hue-group", backgroundColor:"#00A0DC", nextState:"turningOff"
+				attributeState "off", label:'${name}', action:"switch.on", icon:"st.lights.philips.hue-group", backgroundColor:"#ffffff", nextState:"turningOn"
+				attributeState "turningOn", label:'${name}', action:"switch.off", icon:"st.lights.philips.hue-group", backgroundColor:"#00A0DC", nextState:"turningOff"
+				attributeState "turningOff", label:'${name}', action:"switch.on", icon:"st.lights.philips.hue-group", backgroundColor:"#ffffff", nextState:"turningOn"
 			}
  }
 
 	   
         standardTile("On", "device.switch", width: 2, height: 2, decoration: "flat") {
-            state "default", label: "On", action: "switch.on", icon: "sst.lights.multi-light-bulb-on", backgroundColor: "#00A0DC"
+            state "default", label: "On", action: "switch.on", icon: "st.lights.philips.hue-group", backgroundColor: "#00A0DC"
         }
         standardTile("Off", "device.switch", width: 2, height: 2, decoration: "flat") {
-            state "default", label: "Off", action: "switch.off", icon: "st.lights.multi-light-bulb-off", backgroundColor: "#ffffff"
+            state "default", label: "Off", action: "switch.off", icon: "st.lights.philips.hue-group", backgroundColor: "#ffffff"
         }
 
-        main(["light"])
+        main "group"
         details(["light", "switch"])
         }
     }
@@ -64,4 +64,3 @@ def off() {
 def installed() {
     on()
     }
-    
