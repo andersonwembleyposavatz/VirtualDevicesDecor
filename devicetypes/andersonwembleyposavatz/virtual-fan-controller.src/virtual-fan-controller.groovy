@@ -15,10 +15,13 @@ metadata {
 	definition(name: "VIRTUAL Fan Controller", namespace: "andersonwembleyposavatz", author: "Anderson W Posavatz", ocfDeviceType: "oic.d.fan",  runLocally: true , executeCommandsLocally: true) {
 		capability "Actuator"
 		capability "Switch"
-		capability "Refresh"
 		capability "Sensor"
 		capability "Fan Speed"
 		capability "Health Check"
+        
+        command "low"
+		command "medium"
+		command "high"
 
 	}
 
@@ -34,17 +37,26 @@ metadata {
 				attributeState "2", label: "medium", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
 				attributeState "3", label: "high", action: "switch.off", icon: "st.thermostat.fan-on", backgroundColor: "#00a0dc"
 			}
-			tileAttribute("device.fanSpeed", key: "VALUE_CONTROL") {
-				attributeState "VALUE_UP", action: "raiseFanSpeed"
-				attributeState "VALUE_DOWN", action: "lowerFanSpeed"
-			}
+
+	
 		}
 
-		standardTile("switch", "device.switch", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
-			state "default", label: '', action: "refresh.refresh", icon: "st.secondary.refresh"
+		standardTile("0", "device.fanSpeed", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
+			state "default", label: '${name}', action: "off", icon: "st.thermostat.fan-off"
+		}
+        
+		standardTile("1", "device.fanSpeed", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
+			state "default", label: '${name}', action: "low", icon: "st.thermostat.fan-on"
+		}
+		standardTile("2", "device.fanSpeed", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
+			state "default", label: '${name}', action: "medium", icon: "st.thermostat.fan-on"
+		}
+		standardTile("3", "device.fanSpeed", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
+			state "default", label: '${name}', action: "high", icon: "st.thermostat.fan-on"
+	
 		}
 		main "fanSpeed"
-		details "fanSpeed", "on", "off"
+		details "fanSpeed"
 	}
 
 }
@@ -54,14 +66,43 @@ def parse(String description) {
 }
 
 def on() {
-	sendEvent(name: "switch", value: "on")
+	sendEvent(name: "fanSpeed", value: "1")
+    sendEvent(name: "switch", value: "on")
+
 
 }
 
 def off() {
+    sendEvent(name: "fanSpeed", value: "0")
     sendEvent(name: "switch", value: "off")
 
 }
+
+def low() {
+
+	sendEvent(name: "fanSpeed", value: "1")
+    sendEvent(name: "switch", value: "on")
+
+
+}
+
+def medium() {
+
+    sendEvent(name: "fanSpeed", value: "2")
+    sendEvent(name: "switch", value: "on")
+
+
+}
+
+
+def high() {
+
+    sendEvent(name: "fanSpeed", value: "3")
+    sendEvent(name: "switch", value: "on")
+
+}
+
+
 
 def installed() {
 	log.trace "Executing 'installed'"
@@ -74,8 +115,9 @@ def updated() {
 }
 
 def initialize() {
-	sendEvent(name: "switch", value: "off")
-    sendEvent(name: "contact", value: "closed")
+	sendEvent(name: "fanSpeed", value: "0")
+
+   
     
     sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
 	sendEvent(name: "healthStatus", value: "online")

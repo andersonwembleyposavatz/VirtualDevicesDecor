@@ -20,7 +20,6 @@ metadata {
 		capability "Window Shade Preset"
 		capability "Sensor"
 		capability "Health Check"
-		//capability "Switch Level"
 
 	}
 
@@ -75,10 +74,10 @@ metadata {
 		}
 
 		standardTile("windowShadeOpen", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "open", action:"open", icon:"st.Home.home2"
+			state "default", label: "open", action:"open", icon:"st.shades.shade-open"
 		}
 		standardTile("windowShadeClose", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "close", action:"close", icon:"st.Home.home2"
+			state "default", label: "close", action:"close", icon:"st.shades.shade-closed"
 		}
 		standardTile("windowShadePause", "device.windowShade", width: 2, height: 2, decoration: "flat") {
 			state "default", label: "pause", action:"pause", icon:"st.Home.home2"
@@ -95,27 +94,27 @@ metadata {
 			state "default", label: "partially open", action:"partiallyOpen", icon:"st.Home.home2"
 		}
 		standardTile("windowShadeOpening", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "opening", action:"opening", icon:"st.Home.home2"
+			state "default", label: "opening", action:"opening", icon:"st.shades.shade-opening"
 		}
 		standardTile("windowShadeClosing", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "closing", action:"closing", icon:"st.Home.home2"
+			state "default", label: "closing", action:"closing", icon:"st.shades.shade-closing"
 		}
 		standardTile("windowShadeOpened", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "opened", action:"opened", icon:"st.Home.home2"
+			state "default", label: "opened", action:"opened", icon:"st.shades.shade-open"
 		}
 		standardTile("windowShadeClosed", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "closed", action:"closed", icon:"st.Home.home2"
+			state "default", label: "closed", action:"closed", icon:"st.shades.shade-closed"
 		}
 		standardTile("windowShadeUnknown", "device.windowShade", width: 2, height: 2, decoration: "flat") {
 			state "default", label: "unknown", action:"unknown", icon:"st.Home.home2"
 		}
 
-		main(["windowShade"])
-		details(["windowShade", "open", "close", "pause",
+		main "windowShade"
+		details "windowShade", "open", "close", "pause",
 				 "commandsLabel",
 				 "windowShadeOpen", "windowShadeClose", "windowShadePause", "windowShadePreset", "blank", "blank",
 				 "statesLabel",
-				 "windowShadePartiallyOpen", "windowShadeOpening", "windowShadeClosing", "windowShadeOpened", "windowShadeClosed", "windowShadeUnknown"])
+				 "windowShadePartiallyOpen", "windowShadeOpening", "windowShadeClosing", "windowShadeOpened", "windowShadeClosed", "windowShadeUnknown"
 
 	}
 }
@@ -139,14 +138,6 @@ private getSupportedCommandsMap() {
 def parse(String description) {
 	log.debug "parse(): $description"
 }
-
-// Capability commands
-
-// TODO: Implement a state machine to fine tune the behavior here.
-// Right now, tapping "open" and then "pause" leads to "opening",
-// "partially open", then "open" as the open() command completes.
-// The `runIn()`s below should all call a marshaller to handle the
-// movement to a new state. This will allow for shade level sim, too.
 
 def open() {
 	log.debug "open()"
@@ -235,8 +226,6 @@ def initialize() {
 	log.trace "Executing 'initialize'"
 
     sendEvent(name: "windowShade", value: "closed")
-    sendEvent(name: "contact", value: "closed")
-    sendEvent(name: "switch", value: "off")
     
     sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
 	sendEvent(name: "healthStatus", value: "online")

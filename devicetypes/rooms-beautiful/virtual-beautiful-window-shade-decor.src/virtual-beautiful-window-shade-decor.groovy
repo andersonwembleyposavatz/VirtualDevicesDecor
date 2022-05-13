@@ -12,7 +12,6 @@
  *	for the specific language governing permissions and limitations under the License.
  */
 
-import groovy.json.JsonOutput
 
 metadata {
     definition(name: "VIRTUAL Beautiful Window Shade Decor", namespace: "Rooms Beautiful", author: "andersonwembleyposavatz", ocfDeviceType: "oic.d.blind", mnmn: "SmartThings", vid: "generic-shade-2", runLocally: true , executeCommandsLocally: true) {
@@ -26,25 +25,23 @@ metadata {
         capability "Switch"
         capability "Switch Level"
 
-        attribute("replay", "enum")
         attribute("battLife", "enum")
 
-        command "cont"
 
     }
 
     preferences {
-        input name: "invert", type: "bool", title: "Invert Direction", description: "Invert Curtain Direction", defaultValue: false, displayDuringSetup: false, required: true
-    }
+
+}
 
     tiles(scale: 2) {
         multiAttributeTile(name: "windowShade", type: "generic", width: 6, height: 4) {
             tileAttribute("device.windowShade", key: "PRIMARY_CONTROL") {
-                attributeState "open", label: 'Open', action: "close", icon: "http://www.ezex.co.kr/img/st/window_open.png", backgroundColor: "#00A0DC", nextState: "closing"
-                attributeState "closed", label: 'Closed', action: "open", icon: "http://www.ezex.co.kr/img/st/window_close.png", backgroundColor: "#ffffff", nextState: "opening"
-                attributeState "partially open", label: 'Partially open', action: "close", icon: "http://www.ezex.co.kr/img/st/window_open.png", backgroundColor: "#d45614", nextState: "closing"
-                attributeState "opening", label: 'Opening', action: "close", icon: "http://www.ezex.co.kr/img/st/window_open.png", backgroundColor: "#00A0DC", nextState: "closing"
-                attributeState "closing", label: 'Closing', action: "open", icon: "http://www.ezex.co.kr/img/st/window_close.png", backgroundColor: "#ffffff", nextState: "opening"
+                attributeState "open", label:'${name}', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+				attributeState "closed", label:'${name}', action:"open", icon:"st.shades.shade-closed", backgroundColor:"#ffffff", nextState:"opening"
+				attributeState "partially open", label:'${name}', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+				attributeState "opening", label:'${name}', action:"pause", icon:"st.shades.shade-opening", backgroundColor:"#79b821"
+				attributeState "closing", label:'${name}', action:"pause", icon:"st.shades.shade-closing", backgroundColor:"#ffffff"
             }
             tileAttribute("device.battLife", key: "SECONDARY_CONTROL") {
                 attributeState "full", icon: "https://raw.githubusercontent.com/gearsmotion789/ST-Images/master/full.png", label: ""
@@ -52,20 +49,27 @@ metadata {
                 attributeState "low", icon: "https://raw.githubusercontent.com/gearsmotion789/ST-Images/master/low.png", label: ""
                 attributeState "dead", icon: "https://raw.githubusercontent.com/gearsmotion789/ST-Images/master/dead.png", label: ""
             }
-            tileAttribute("device.level", key: "SLIDER_CONTROL") {
-                attributeState "level", action: "switch level.setLevel"
-            }
+         }
+         
+        standardTile("windowShade", "device.windowShade", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
+            state "open", label: 'Open', icon:"st.shades.shade-open", action: 'close', backgroundColor: "#79b821", nextState:"closing"
+            state "closed", label: 'Closed', icon: "st.shades.shade-closed" , action: 'open', backgroundColor: "#ffffff", nextState:"opening"
         }
-        standardTile("contPause", "device.replay", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
-            state "pause", label: "Pause", icon: 'https://raw.githubusercontent.com/gearsmotion789/ST-Images/master/pause.png', action: 'pause', backgroundColor: "#e86d13", nextState: "cont"
-            state "cont", label: "Cont.", icon: 'https://raw.githubusercontent.com/gearsmotion789/ST-Images/master/play.png', action: 'cont', backgroundColor: "#90d2a7", nextState: "pause"
+			                      
+    standardTile("refresh", "device.refresh", decoration: "flat", width: 2, height: 2) {
+ 		state "default", action:"refresh", icon:"st.secondary.refresh"
+ 		
         }
-        standardTile("refresh", "device.refresh", inactiveLabel: false, decoration: "flat", width: 2, height: 1) {
-            state "default", label: "", action: "refresh.refresh", icon: "st.secondary.refresh"
-        }
-
-        main "windowShade", "contact"
-        details(["windowShade", "contPause", "refresh"])
+        	
+		valueTile("shadeLevel", "device.level", width: 4, height: 1) {
+			state "level", label: 'Shade is ${currentValue}% up', defaultState: true
+		}
+		controlTile("levelSliderControl", "device.level", "slider", width:2, height: 1, inactiveLabel: false) {
+			state "level", action:"switch level.setLevel"
+		}
+        
+        main "windowShade"
+        details "windowShade", "contact", "battery", "shadeLevel", "levelSliderControl"
     }
 }
 
@@ -144,25 +148,29 @@ def parse(String description) {
 
 def off() {
     log.debug "off()" +
-        sendEvent(name: "level", value: 0)
-        sendEvent(name: "contatc", value: "closed")
+        sendEvent(name: "level", value: 100)
+        sendEvent(name: "windowShade", value: "closed")
+        sendEvent(name: "contact", value: "closed")
 }
 
 def on() {
     log.debug "on()" +
-        sendEvent(name: "level", value: 100)
+        sendEvent(name: "level", value: 0)
+        sendEvent(name: "windowShade", value: "open")
         sendEvent(name: "contact", value: "open")
 }
 
 def close() {
     log.debug "close()" +
-        sendEvent(name: "level", value: 0)
+        sendEvent(name: "level", value: 100)
+        sendEvent(name: "windowShade", value: "closed")
         sendEvent(name: "contact", value: "closed")
 }
 
 def open() {
     log.debug "open()" +
-        sendEvent(name: "level", value: 100)
+        sendEvent(name: "level", value: 0)
+        sendEvent(name: "windowShade", value: "open")
         sendEvent(name: "contact", value: "open")
 }
 
@@ -171,12 +179,6 @@ def pause() {
         sendEvent(name: "replay", value: "cont") +
         sendEvent(name: "windowShade", value: "partially open")
         sendEvent(name: "contact", value: "open")
-}
-
-def cont() {
-    log.debug(CLUSTER_WINDOW_COVERING, 0x02) +
-        sendEvent(name: "replay", value: "pause")
-        sendEvent(name: "contatc", value: "open")
 }
 
 def setLevel(value) {
@@ -195,6 +197,7 @@ def setLevel(value) {
             sendEvent(name: "level", value: value)
     }
 }
+
 
 private handleBatteryEvent(volts) {
     def linkText = getLinkText(device)
@@ -224,51 +227,30 @@ def refresh() {
      
 }
 
-def configure() {
-    // Device-Watch allows 2 check-in misses from device + ping (plus 2 min lag time)
-    sendEvent(name: "checkInterval", value: 2 * 10 * 60 + 2 * 60, displayed: false, data: [protocol: "cloud", scheme:"untracked"])
-    log.debug "Configuring Reporting and Bindings."
-    return refresh()
-}
-
 def installed() {
-    sendEvent(name: "supportedWindowShadeCommands", value: JsonOutput.toJson(["open", "close", "pause"]), displayed: false)
-    sendEvent(name: "battery", value: 100)
-    sendEvent(name: "battLife", value: "full")
-    response(refresh())
+	log.trace "Executing 'installed'"
+	initialize()
 }
 
 def updated() {
-    if (invert.value == false)
-        response(normal())
-    else if (invert.value == true)
-        response(reverse())
+	log.trace "Executing 'updated'"
+	initialize()
 }
 
-def normal() {
-    if (device.currentState("windowShade").value == "open") {
-        sendEvent(name: "switch", value: "off")
-        sendEvent(name: "windowShade", value: "closed")
-        sendEvent(name: "level", value: 100 - Integer.parseInt(device.currentState("level").value))
-        log.debug("normal-close")
-    } else {
-        sendEvent(name: "switch", value: "on")
-        sendEvent(name: "windowShade", value: "open")
-        sendEvent(name: "level", value: 100 - Integer.parseInt(device.currentState("level").value))
-        log.debug("normal-open")
-    }
+private initialize() {
+	log.trace "Executing 'initialize'"
+
+    sendEvent(name: "battery", value: 100)
+    sendEvent(name: "battLife", value: "full")
+    sendEvent(name: "level", value: 0)
+    sendEvent(name: "windowShade", value: "open")
+    sendEvent(name: "contact", value: "open") 
+
+	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
+	sendEvent(name: "healthStatus", value: "online")
+	sendEvent(name: "DeviceWatch-Enroll", value: [protocol: "cloud", scheme:"untracked"].encodeAsJson(), displayed: false)
+    
 }
 
-def reverse() {
-    if (device.currentState("windowShade").value == "open") {
-        sendEvent(name: "switch", value: "off")
-        sendEvent(name: "windowShade", value: "closed")
-        sendEvent(name: "level", value: 100 - Integer.parseInt(device.currentState("level").value))
-        log.debug("reverse-close")
-    } else {
-        sendEvent(name: "switch", value: "on")
-        sendEvent(name: "windowShade", value: "open")
-        sendEvent(name: "level", value: 100 - Integer.parseInt(device.currentState("level").value))
-        log.debug("reverse-open")
-    }
-}
+
+

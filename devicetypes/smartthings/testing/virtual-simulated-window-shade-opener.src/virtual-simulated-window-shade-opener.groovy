@@ -14,15 +14,14 @@
  *
  */
 metadata {
-	definition (name: "VIRTUAL Simulated Window Shade Opener", namespace: "smartthings/testing", author: "SmartThings") {
+	definition (name: "VIRTUAL Simulated Window Shade Opener", namespace: "smartthings/testing", author: "SmartThings", runLocally: true , executeCommandsLocally: true, ocfDeviceType: "oic.d.blind") {
 		capability "Actuator"
-		capability "Window Shade Level"
-		capability "Switch"
 		capability "Window Shade"
-		capability "Contact Sensor"
-		capability "Refresh"
 		capability "Sensor"
 		capability "Health Check"
+        
+        command "open"
+        command "close"
 	}
 
 	simulator {
@@ -38,10 +37,10 @@ metadata {
 			
 		}
 		standardTile("open", "device.windowShade", inactiveLabel: false, decoration: "flat") {
-			state "open", label:'${name}', action:"open", icon:"st.shades.shade-opening"
+			state "open", label:'${name}', action:"close", icon:"st.shades.shade-closing"
 		}
 		standardTile("close", "device.windowShade", inactiveLabel: false, decoration: "flat") {
-			state "closed", label:'${name}', action:"closed", icon:"st.shades.shade-closing"
+			state "close", label:'${name}', action:"open", icon:"st.shades.shade-opening"
 		}
 
 		main "windowShade"
@@ -63,27 +62,12 @@ def close() {
 	runIn(1, finishClosing)
 }
 
-def on() {
-	sendEvent(name: "windowShade", value: "opening")
-    runIn(1, finishOpening)
-}
-
-def off() {
-    sendEvent(name: "windowShade", value: "closing")
-	runIn(1, finishClosing)
-}
-
-
 def finishOpening() {
     sendEvent(name: "windowShade", value: "open")
-    sendEvent(name: "contact", value: "open")
-    sendEvent(name: "switch", value: "on")
 }
 
 def finishClosing() {
-    sendEvent(name: "windowShade", value: "closed")
-    sendEvent(name: "contact", value: "closed")
-    sendEvent(name: "switch", value: "off")
+    sendEvent(name: "windowShade", value: "close")
 }
 
 def installed() {
@@ -98,6 +82,8 @@ def updated() {
 
 private initialize() {
 	log.trace "Executing 'initialize'"
+    
+    sendEvent(name: "windowShade", value: "open")
 
 	sendEvent(name: "DeviceWatch-DeviceStatus", value: "online")
 	sendEvent(name: "healthStatus", value: "online")

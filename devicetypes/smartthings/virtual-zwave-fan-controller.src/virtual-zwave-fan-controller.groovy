@@ -1,7 +1,5 @@
 /**
- *  VIRTUAL Controll for FAN
- *
- *  Copyright 2021 Anderson Wembley Posavatz
+ *  Copyright 2018 SmartThings
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -11,24 +9,31 @@
  *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
  *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
+ *
  */
 metadata {
-	definition (name: "VIRTUAL Controll for FAN", namespace: "andersonwembleyposavatz", author: "Anderson Wembley Posavatz", ocfDeviceType: "oic.d.fan",  runLocally: true, minHubCoreVersion: '000.021.00001', executeCommandsLocally: true, mnmn: "SmartThings") {
-		capability "Fan Speed"
-        capability "Actuator"
-		capability "Switch Level"
-		capability "Refresh"
-		capability "Sensor"
+	definition(name: "VIRTUAL Z-Wave Fan Controller", namespace: "smartthings", author: "SmartThings", ocfDeviceType: "oic.d.fan",  runLocally: true , executeCommandsLocally: true) {
 		capability "Switch"
+		capability "Fan Speed"
 		capability "Health Check"
+		capability "Actuator"
+		capability "Sensor"
 
 		command "low"
 		command "medium"
 		command "high"
 		command "raiseFanSpeed"
 		command "lowerFanSpeed"
+
+
 	}
 
+	simulator {
+		status "off": "switch.off"
+		status "low": "fanSpeed.low"
+		status "medium": "fanSpeed.medium"
+		status "high": "fanSpeed.high"
+	}
 
 	tiles(scale: 2) {
 		multiAttributeTile(name: "fanSpeed", type: "generic", width: 6, height: 4, canChangeIcon: true) {
@@ -44,65 +49,30 @@ metadata {
 			}
 		}
 
-		standardTile("refresh", "device.switch", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
-			state "default", label: '', action: "refresh.refresh", icon: "st.secondary.refresh"
-		}
 		main "fanSpeed"
-		details(["fanSpeed", "refresh"])
+		details(["fanSpeed"])
 	}
 
 }
 
 def installed() {
-	response(refresh())
+
 }
 
 def parse(String description) {
-    //no parsing - just simulating
-}
-
-
-
-def generateFanSpeedEvent(level) {
-	def rawLevel = level as int
-	def result = []
-
-	if (0 <= rawLevel && rawLevel <= 100) {
-		def value = (rawLevel ? "on" : "off")
-		sendEvent(name: "switch", value: value)
-		sendEvent(name: "level", value: rawLevel == 99 ? 100 : rawLevel)
-
-		def fanLevel = 0
-
-		// The GE, Honeywell, and Leviton treat 33 as medium, so account for that
-		if (1 <= rawLevel && rawLevel <= 32) {
-			fanLevel = 1
-		} else if (33 <= rawLevel && rawLevel <= 66) {
-			fanLevel = 2
-		} else if (67 <= rawLevel && rawLevel <= 100) {
-			fanLevel = 3
-		}
-		sendEvent(name: "fanSpeed", value: fanLevel)
-	}
+	
 }
 
 def on() {
-	generateFanSpeedEvent(100) //should we change to a last known internal level and fanSpeed -- or only change if not already on?
-    //switch=off, level=100, fanSpeed=3
+	sendEvent(name: "fanSpeed", value: "1")
+    sendEvent(name: "switch", value: "on")
+
 }
 
 def off() {
-	generateFanSpeedEvent(0); //switch=off, level=0, fanSpeed=0
-}
-
-def setLevel(value, rate = null) {
-	def cmds = []
-
-	def level = value as Integer
-	level = level == 255 ? level : Math.max(Math.min(level, 99), 0)
-	log.debug "setLevel >> value: $level"
-
-	generateFanSpeedEvent(level)
+	sendEvent(name: "fanSpeed", value: "0")
+    sendEvent(name: "switch", value: "off")
+    
 }
 
 def setFanSpeed(speed) {
@@ -114,6 +84,8 @@ def setFanSpeed(speed) {
 		medium()
 	} else if (speed as Integer == 3) {
 		high()
+	} else if (speed as Integer == 4) {
+		max()
 	}
 }
 
@@ -126,21 +98,20 @@ def lowerFanSpeed() {
 }
 
 def low() {
-	setLevel(32)
+	sendEvent(name: "fanSpeed", value: "1")
 }
 
 def medium() {
-	setLevel(66)
+	sendEvent(name: "fanSpeed", value: "2")
 }
 
 def high() {
-	setLevel(99)
+	sendEvent(name: "fanSpeed", value: "3")
 }
 
-def refresh() {
-	//nothing for now
+def max() {
+	sendEvent(name: "fanSpeed", value: "3")
+
 }
 
-def ping() {
-	refresh()
-}
+

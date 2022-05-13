@@ -16,11 +16,15 @@
 metadata {
 	definition (name: "VIRTUAL Windows Shade for Decor", namespace: "andersonwembleyposavatz", author: "Anderson W Posavatz", runLocally: true , executeCommandsLocally: true , ocfDeviceType: "oic.d.blind", mnmn: "SmartThings", vid: "generic-shade-2") {
 		capability "Actuator"
-		capability "Contact Sensor"
 		capability "Window Shade"
 		capability "Sensor"
 		capability "Battery"
 		capability "Health Check"
+        
+        command "open"
+        command "close"
+        command "up"
+        command "down"
         
            
 	}
@@ -34,9 +38,9 @@ metadata {
             tileAttribute ("device.windowsShade", key: "PRIMARY_CONTROL") {
                 attributeState "open", label:'${name}', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
 				attributeState "closed", label:'${name}', action:"open", icon:"st.shades.shade-closed", backgroundColor:"#ffffff", nextState:"opening"
-				attributeState "partially open", label:'Open', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
-				attributeState "opening", label:'${name}', action:"pause", icon:"st.shades.shade-opening", backgroundColor:"#79b821", nextState:"partially open"
-				attributeState "closing", label:'${name}', action:"pause", icon:"st.shades.shade-closing", backgroundColor:"#ffffff", nextState:"partially open" 
+				attributeState "partially open", label:'${name}', action:"close", icon:"st.shades.shade-open", backgroundColor:"#79b821", nextState:"closing"
+				attributeState "opening", label:'${name}', action:"pause", icon:"st.shades.shade-opening", backgroundColor:"#79b821"
+				attributeState "closing", label:'${name}', action:"pause", icon:"st.shades.shade-closing", backgroundColor:"#ffffff"
     }
             tileAttribute ("device.battery", key: "SECONDARY_CONTROL") {
                 attributeState "battery", label: "74", unit: "%"
@@ -44,16 +48,16 @@ metadata {
         }
 
 		standardTile("open", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "open", action:"open", icon:"st.shades.shade-open"
+			state "default", label: '${name}', action:"open", icon:"st.shades.shade-closed"
 		}
 		standardTile("closed", "device.windowShade", width: 2, height: 2, decoration: "flat") {
-			state "default", label: "closed", action:"close", icon:"st.shades.shade-closed"
+			state "default", label: '${name}', action:"closed", icon:"st.shades.shade-open"
 		
 	    }
 
         
 		main "windowShade"
-		details "windowShade", "battery", "contact", "windowShadeOpen", "windowShadeClose", "windowShadePause"
+		details "windowShade", "battery", "up", "down"
                 }
 } 
 
@@ -67,20 +71,27 @@ def open() {
 }
 
 def close() {
-        sendEvent(name: "windowShade", value: "closing")
+    sendEvent(name: "windowShade", value: "closing")
+	runIn(3, finishClosing)
+}
+
+def up() {
+	sendEvent(name: "windowShade", value: "opening")
+        runIn(3, finishOpening)
+}
+
+def down() {
+     sendEvent(name: "windowShade", value: "closing")
 	runIn(3, finishClosing)
 }
 
 def finishOpening() {
 	sendEvent(name: "windowShade", value: "open")
-    sendEvent(name: "contact", value: "open")
-
 
 }
 
 def finishClosing() {
 	sendEvent(name: "windowShade", value: "closed")
-    sendEvent(name: "contact", value: "closed")
 
 
 }
@@ -107,8 +118,7 @@ def updated() {
 private initialize() {
     setBatteryLevel(74)
 
-    sendEvent(name: "windowShade", value: "open")
-    sendEvent(name: "contact", value: "open")
+    sendEvent(name: "windowShade", value: "close")
     
     sendEvent(name: "battery", value: device.currentValue("battery") ?: 74)
 
